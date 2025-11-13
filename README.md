@@ -448,8 +448,8 @@ flutter build ios
 
 - [x] Backend infrastructure setup
 - [x] FastAPI + PostgreSQL + Docker
-- [ ] Database models & schemas
-- [ ] Goals API endpoints
+- [x] Database models & schemas
+- [x] Goals API endpoints
 - [ ] Tracking API endpoints
 - [ ] Flutter project setup
 - [ ] Basic UI screens

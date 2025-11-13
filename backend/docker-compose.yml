@@ -1,0 +1,97 @@
+# Docker Compose file for Fomode backend
+# This defines the syntax version we're using
+version: "3.8"
+
+# Services are the containers we want to run
+services:
+  # Database service (PostgreSQL)
+  db:
+    # Use official PostgreSQL 16 image from Docker Hub
+    image: postgres:16-alpine
+
+    # Container name (easier to reference than auto-generated names)
+    container_name: fomode_db
+
+    # Environment variables for PostgreSQL
+    # These configure the database name, user, and password
+    environment:
+      # Create a database called "fomode_db"
+      POSTGRES_DB: fomode_db
+
+      # Create a user name "fomode_user"
+      POSTGRES_USER: fomode_user
+
+      # Set password (CHANGE THIS in production!)
+      POSTGRES_PASSWORD: dev_password_123
+
+    # Volumes persist data even when container is removed
+    # This maps a named volume to PostgreSQL's data directory
+    # Without this, all data would be lost when container stops
+    volumes:
+      - fomode_postgres_data:/var/lib/postgresql/data
+
+    # Port mapping: host_port:container_port
+    # This exposes PostgreSQL so we can connect with tools like pgAdmin
+    # The database is accessible on localhost:5432
+    ports:
+      - "5432:5432"
+
+    # Health check to know when database is ready
+    # This prevents the API from starting before DB is ready
+    healthcheck:
+      # pg_isready checks if PostgreSQL is accepting connections
+      test: ["CMD-SHELL", "pg_isready -U fomode_user -d fomode_db"]
+      interval: 5s # Check every 5 seconds
+      timeout: 5s # Timeout after 5 seconds
+      retries: 5 # Try 5 times before marking as unhealthy
+
+  # API service (FastAPI application)
+  api:
+    # Build the image from our Dockerfile
+    build:
+      context: . # Current directory
+      dockerfile: Dockerfile # Dockerfile should be in the same directory as this docker-compose.yml
+
+    # Container name for the API
+    container_name: fomode_api
+
+    # Port mapping for the API
+    # Access the API at http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Environment variables for the API
+    environment:
+      # Database connection URL
+      # Format: postgresql://user:password@host:port/database
+      # NOTE: "db" needs to match the service name above
+      # Docker's internal DNS resolves "db" to the database container
+      DATABASE_URL: postgresql://fomode_user:dev_password_123@db:5432/fomode_db
+
+      ENVIRONMENT: development
+      API_TITLE: Fomode API
+      API_VERSION: 0.1.0
+      ALLOWED_ORIGINS: "*" # Allow all origins for CORS (change in production!)
+
+    # Mount current directory to /app in container
+    # This enables hot-reload: when we edit files locally,
+    # changes are immediately reflected in the container
+    volumes:
+      - .:/app
+
+    # depends_on with condition ensures API waits for DB to be healthy
+    # This prevents "database connection failed" errors on startup
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Restart policy: always restart if container crashes
+    # This is useful in development when we're testing things
+    restart: unless-stopped
+
+  # Named volumes section
+  # This creates a persistent volume for database data
+volumes:
+  fomode_postgres_data:
+    # Docker manages this volume's location on the host machine
+    # Data persists across container restarts and rebuilds

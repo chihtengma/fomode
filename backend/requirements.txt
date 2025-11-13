@@ -1,0 +1,37 @@
+# Fast API web framework
+# Provides automatic API documentation and data valiadation
+fastapi
+
+# ASGI Server
+# Uvicorn is the server that runs FastAPI application
+# It handles HTTP requests and is built for async performance
+uvicorn[standard]
+
+# Database ORM (Object-Relational Mapping)
+# SQLAlchemy allows us work with databases using Python objects instead of raw SQLs
+sqlalchemy
+
+# PostgreSQL Driver
+# psycopg2-binary is the adapter that allows Python to connect to PostgreSQL databases
+# "binary" version includes pre-compiled libraries (easier to install)
+psycopg2-binary
+
+# Database Migrations
+# Alembic handles database schema changes over time
+# Creates migration files when we modify our database structure
+alembic
+
+# Environment Variables
+# python-dotenv loads environment variables from .env file
+python-dotenv
+
+# CORS Middleware (for frontend communication)
+# Allows cross-origin requests from frontend applications
+# (Already included in FastAPI, but we can specify it here for clarity)
+
+# Password hashing (for user authentication)
+pwdlib[argon2]
+
+# JWT Authentication
+# Handles JSON Web Tokens for secure authentication
+python-jose[cryptography]

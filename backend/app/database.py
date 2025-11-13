@@ -65,17 +65,36 @@ def get_db() -> Generator[Session, None, None]:
 
 
 # Helper function to initialize database tables
-def init_db() -> None:
+def init_db():
     """
-    Creates all database tables.
-
-    This function calls when the application starts.
-    It creates tables for all models that inherit from Base.
-
-    NOTE: In production, we'll use Alembic for migrations instead, but this is useful for development.
+    Create all database tables.
     """
+    # Import models explicitly
+    from app.models.focus_session import FocusSession
+    from app.models.goal import Goal
+    from app.models.usage import UsageLog
 
-    # Import all models here to ensure they are registered with Base
+    print("=" * 50)
+    print("📋 Models imported:")
+    print(f"  - Goal: {Goal.__tablename__}")
+    print(f"  - UsageLog: {UsageLog.__tablename__}")
+    print(f"  - FocusSession: {FocusSession.__tablename__}")
+    print("=" * 50)
 
+    # Check what metadata knows about
+    print("\n📊 Tables in metadata:")
+    for table in Base.metadata.tables:
+        print(f"  - {table}")
+    print("=" * 50)
+
+    # Create all tables
     Base.metadata.create_all(bind=engine)
+
+    print("\n" + "=" * 50)
     print("✅ Database tables created successfully!")
+    print("=" * 50)
+    print("Tables created:")
+    print("  - goals")
+    print("  - usage_logs")
+    print("  - focus_sessions")
+    print("=" * 50)

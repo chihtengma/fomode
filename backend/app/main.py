@@ -10,8 +10,11 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+
+from app.database import get_db
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -21,17 +24,37 @@ load_dotenv()  # Load environment variables from .env file
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # STARTUP: Code here runs when the application starts
-    print("🚀 Starting Fomode API...")
-    print("📝 API Docs available at: http://localhost:8000/docs")
-    print("🔧 Environment:", os.getenv("ENVIRONMENT", "development"))
+    print("=" * 60)
+    print("🚀 Starting Anti-Procrastination API...")
+    print("=" * 60)
+    print("📝 API Docs: http://localhost:8000/docs")
+    print(f"🔄 Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    print("=" * 60)
 
-    # TODO: Initialize database connections, load models, etc.
+    # Initialize database tables
+    print("\n🗄️  Initializing database...")
+    from app.database import init_db
 
+    try:
+        init_db()
+        print("✅ Database initialization complete!\n")
+    except Exception as err:
+        print(f"❌ Database initialization failed: {err}\n")
+        raise
+
+    print("=" * 60)
+    print("✅ Application startup complete!")
+    print("=" * 60)
+
+    # The yield separates startup from shutdown
     yield
 
     # SHUTDOWN: Code here runs when the application shuts down
+    print("\n" + "=" * 60)
     print("👋 Shutting down Anti-Procrastination API...")
+    print("=" * 60)
     print("✅ Cleanup completed")
+    print("=" * 60)
 
     # TODO: Close any open connections, save state, etc.
     # Example:
@@ -97,8 +120,84 @@ async def api_info() -> dict:
     }
 
 
-# TODO: Add routers here as we build them
-# Example:
-# from app.routers import goals, tracking
-# app.include_router(goals.router, prefix="/goals", tags=["goals"])
-# app.include_router(tracking.router, prefix="/tracking", tags=["tracking"])
+@app.get("/init-db")
+async def initialize_database():
+    """
+    Manually initialize database tables.
+
+    This creates all tables defined in models.
+    Safe to call multiple times (won't recreate existing tables).
+    """
+    try:
+        from app.database import init_db
+
+        init_db()
+        return {
+            "status": "success",
+            "message": "Database tables created successfully! ✅",
+        }
+    except Exception as e:
+        import traceback
+
+        return {
+            "status": "error",
+            "message": f"Failed to create tables: {str(e)}",
+            "traceback": traceback.format_exc(),
+        }
+
+
+@app.get("/db-test")
+async def test_database(db: Session = Depends(get_db)):
+    """
+    Test database connection and models.
+
+    This endpoint:
+        1. Tests database connectivity
+        2. Shows table input
+        3. Creates a test goal and retrieves it
+
+    Returns:
+        dict: Test results
+    """
+    from sqlalchemy import inspect
+
+    from app.database import engine
+    from app.models import FocusSession, Goal, UsageLog
+
+    try:
+        inspector = inspect(engine)
+        tables = inspector.get_table_names()
+
+        # Count existing records
+        goal_count = db.query(Goal).count()
+        usage_count = db.query(UsageLog).count()
+        focus_count = db.query(FocusSession).count()
+
+        # Try to create a test goal
+        test_goal = Goal(
+            user_id=1,
+            title="Test Goal - Database Connection",
+            description="This is a test goal to verify database is working",
+        )
+        db.add(test_goal)
+        db.commit()
+        db.refresh(test_goal)
+
+        return {
+            "status": "success",
+            "message": "Database connection successful! ✅",
+            "tables": tables,
+            "record_counts": {
+                "goals": goal_count,
+                "usage_logs": usage_count,
+                "focus_sessions": focus_count,
+            },
+            "test_goal_created": {
+                "id": test_goal.id,
+                "title": test_goal.title,
+                "completed": test_goal.completed,
+                "created_at": test_goal.created_at,
+            },
+        }
+    except Exception as err:
+        return {"status": "error", "message": f"Database test failed: {str(err)}"}

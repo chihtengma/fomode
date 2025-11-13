@@ -2,6 +2,9 @@
 # Provides automatic API documentation and data valiadation
 fastapi
 
+# Core framework
+pydantic
+
 # ASGI Server
 # Uvicorn is the server that runs FastAPI application
 # It handles HTTP requests and is built for async performance

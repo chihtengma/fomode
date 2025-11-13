@@ -7,12 +7,12 @@ with databases tables as if they were Python classes.
 """
 
 import os
+from typing import Generator
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.sql.base import Generator
 
 load_dotenv()  # Reads .env file and loads variables
 

@@ -7,11 +7,12 @@ and startup/shutdown events.
 
 import os
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import Any, AsyncIterator, List
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -81,7 +82,7 @@ app: FastAPI = FastAPI(
 # CORS (Cross-Origin Resource Sharing) Middleware
 # This allows the API to be accessed from different origins (e.g., frontend apps)
 app.add_middleware(
-    CORSMiddleware,
+    middleware_class=CORSMiddleware,
     # List of origins (domains) allowed to make requests
     # In production, this should be set to the actual frontend URL(s)
     # ["http://localhost:3000", "https://your-frontend-domain.com"]
@@ -94,6 +95,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ============================================
+# Include Routers
+# ============================================
+
+# Import routers
+from app.routers import goals  # noqa: E402
+
+# Include routers with prefixes
+app.include_router(goals.router)
+
 
 # Root Endpoint (Health Check)
 # This simple endpoint lets us check if the API is running
@@ -105,6 +116,11 @@ async def root() -> dict:
         "status": "healthy",
         "version": os.getenv("API_VERSION", "0.1.0"),
         "docs": "/docs",
+        "endpoints": {
+            "goals": "/goals",
+            "tracking": "/tracking (coming soon)",
+            "focus": "/focus (coming soon)",
+        },
     }
 
 
@@ -117,11 +133,16 @@ async def api_info() -> dict:
         "version": os.getenv("API_VERSION", "0.1.0"),
         "environment": os.getenv("ENVIRONMENT", "development"),
         "description": os.getenv("API_DESCRIPTION", "API for Fomode application"),
+        "available_endpoints": {
+            "goals": "/goals",
+            "tracking": "/tracking (coming soon)",
+            "focus": "/focus (coming soon)",
+        },
     }
 
 
-@app.get("/init-db")
-async def initialize_database():
+@app.get(path="/init-db")
+async def initialize_database() -> dict[str, str]:
     """
     Manually initialize database tables.
 
@@ -146,8 +167,10 @@ async def initialize_database():
         }
 
 
-@app.get("/db-test")
-async def test_database(db: Session = Depends(get_db)):
+@app.get(path="/db-test")
+async def test_database(
+    db: Session = Depends(dependency=get_db),
+) -> dict[str, str] | dict[str, Any]:
     """
     Test database connection and models.
 
@@ -165,13 +188,13 @@ async def test_database(db: Session = Depends(get_db)):
     from app.models import FocusSession, Goal, UsageLog
 
     try:
-        inspector = inspect(engine)
-        tables = inspector.get_table_names()
+        inspector: Inspector = inspect(engine)
+        tables: List[str] = inspector.get_table_names()
 
         # Count existing records
-        goal_count = db.query(Goal).count()
-        usage_count = db.query(UsageLog).count()
-        focus_count = db.query(FocusSession).count()
+        goal_count: int = db.query(Goal).count()
+        usage_count: int = db.query(UsageLog).count()
+        focus_count: int = db.query(FocusSession).count()
 
         # Try to create a test goal
         test_goal = Goal(

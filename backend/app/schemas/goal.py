@@ -13,7 +13,7 @@ Pydantic vs SQLAlchemy:
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -139,5 +139,5 @@ class GoalList(BaseModel):
     Used when: GET /goals (returns all goals)
     """
 
-    goals: List[Goal] = Field(..., description="List of goals")
+    goals: Sequence[Goal] = Field(..., description="List of goals")
     total: int = Field(..., description="Total number of goals")

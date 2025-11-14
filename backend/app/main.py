@@ -100,10 +100,11 @@ app.add_middleware(
 # ============================================
 
 # Import routers
-from app.routers import goals  # noqa: E402
+from app.routers import goals, tracking  # noqa: E402
 
 # Include routers with prefixes
 app.include_router(goals.router)
+app.include_router(tracking.router)
 
 
 # Root Endpoint (Health Check)
@@ -118,7 +119,7 @@ async def root() -> dict:
         "docs": "/docs",
         "endpoints": {
             "goals": "/goals",
-            "tracking": "/tracking (coming soon)",
+            "tracking": "/tracking",
             "focus": "/focus (coming soon)",
         },
     }
@@ -135,7 +136,7 @@ async def api_info() -> dict:
         "description": os.getenv("API_DESCRIPTION", "API for Fomode application"),
         "available_endpoints": {
             "goals": "/goals",
-            "tracking": "/tracking (coming soon)",
+            "tracking": "/tracking",
             "focus": "/focus (coming soon)",
         },
     }

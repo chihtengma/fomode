@@ -100,11 +100,12 @@ app.add_middleware(
 # ============================================
 
 # Import routers
-from app.routers import goals, tracking  # noqa: E402
+from app.routers import focus, goals, tracking  # noqa: E402
 
 # Include routers with prefixes
 app.include_router(goals.router)
 app.include_router(tracking.router)
+app.include_router(focus.router)
 
 
 # Root Endpoint (Health Check)
@@ -120,7 +121,7 @@ async def root() -> dict:
         "endpoints": {
             "goals": "/goals",
             "tracking": "/tracking",
-            "focus": "/focus (coming soon)",
+            "focus": "/focus",
         },
     }
 
@@ -137,7 +138,7 @@ async def api_info() -> dict:
         "available_endpoints": {
             "goals": "/goals",
             "tracking": "/tracking",
-            "focus": "/focus (coming soon)",
+            "focus": "/focus",
         },
     }
 

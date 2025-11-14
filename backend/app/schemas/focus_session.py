@@ -11,7 +11,7 @@ Key features:
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Sequence
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -323,25 +323,11 @@ class FocusStats(BaseModel):
 class FocusSessionList(BaseModel):
     """
     Schema for returning multiple focus sessions.
-
-    Used when: GET /focus/history
-
-    Returns list of sessions with metadata.
-
-    Example response:
-        {
-            "sessions": [...],
-            "total": 10,
-            "active_session": {...}
-        }
     """
 
-    sessions: list[FocusSession] = Field(
-        default=..., description="List of focus sessions"
-    )
+    model_config = ConfigDict(from_attributes=True)
+    sessions: Sequence[FocusSession] = Field(..., description="List of focus sessions")
 
     total: int = Field(default=..., ge=0, description="Total number of sessions")
 
-    active_session: Optional[FocusSession] = Field(
-        None, description="Currently active session (if any)"
-    )
+    active_session: Optional[FocusSession] = None

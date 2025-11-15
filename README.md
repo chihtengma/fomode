@@ -451,7 +451,7 @@ flutter build ios
 - [x] Database models & schemas
 - [x] Goals API endpoints
 - [x] Tracking API endpoints
-- [ ] Flutter project setup
+- [x] Flutter project setup
 - [ ] Basic UI screens
 - [ ] App monitoring service
 - [ ] Interception dialog

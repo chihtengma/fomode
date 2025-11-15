@@ -33,7 +33,6 @@ backend/alembic/versions/*.pyc
 # ============================================
 # MOBILE (Flutter)
 # ============================================
-
 # Flutter/Dart/Pub related
 mobile/.dart_tool/
 mobile/.flutter-plugins
@@ -46,6 +45,10 @@ mobile/flutter_*.png
 mobile/linked_*.ds
 mobile/unlinked.ds
 mobile/unlinked_spec.ds
+
+# Flutter generated files
+mobile/ios/Flutter/.last_build_id
+mobile/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
 
 # Android related
 mobile/android/**/gradle-wrapper.jar

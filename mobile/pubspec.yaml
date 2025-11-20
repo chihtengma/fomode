@@ -13,6 +13,7 @@ dependencies:
 
   # UI Components
   cupertino_icons: ^1.0.2
+  hugeicons: ^0.0.7
 
   # State Management
   # Provider is simpler than Riverpod for beginners
@@ -28,6 +29,14 @@ dependencies:
   # Local Storage
   # Saves user preferences, cache data locally
   shared_preferences: ^2.2.2
+  # Secure storage for JWT tokens
+  flutter_secure_storage: ^9.0.0
+
+  # Authentication
+  # Google Sign-In
+  google_sign_in: ^6.2.1
+  # Apple Sign-In (iOS only)
+  sign_in_with_apple: ^6.1.0
 
   # Date/Time Utilities
   # Formats dates nicely (e.g., "Nov 14, 2025")
@@ -38,6 +47,14 @@ dependencies:
   flutter_slidable: ^4.0.3
   # Progress indicators (circular, linear)
   percent_indicator: ^4.2.3
+  # Beautiful charts
+  fl_chart: ^0.69.0
+  # SVG rendering for brand icons
+  flutter_svg: ^2.0.10
+
+  # Notifications
+  # Local push notifications for focus reminders
+  flutter_local_notifications: ^18.0.1
 
   # Platform-specific features (we'll add these later when needed)
   # app_usage: ^2.0.0        # Monitor app usage (Android only)
@@ -53,7 +70,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Assets (we'll add images/icons here later)
-  # assets:
-  #   - assets/images/
-  #   - assets/icons/
+  # Assets
+  assets:
+    - assets/images/
+

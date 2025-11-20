@@ -17,7 +17,7 @@ import '../services/goals_api_service.dart';
 /// 1. Screens/widgets "listen" to this provider
 /// 2. When data changes, provider calls notifyListeners()
 /// 3. UI automatically rebuilds with new data
-class GoalProvier extends ChangeNotifier {
+class GoalProvider extends ChangeNotifier {
   // Private fields
   final GoalsApiService _apiService;
   List<Goal> _goals = [];
@@ -25,7 +25,7 @@ class GoalProvier extends ChangeNotifier {
   String? _error;
 
   // Constructor
-  GoalProvier({GoalsApiService? apiService})
+  GoalProvider({GoalsApiService? apiService})
       : _apiService = apiService ?? GoalsApiService();
 
   // ============================================
